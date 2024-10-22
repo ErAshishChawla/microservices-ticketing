@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { json } from "body-parser";
 import "express-async-errors";
+import mongoose from "mongoose";
 
 import { currentUserRouter } from "./routes/current-user";
 import { signinRouter } from "./routes/signin";
@@ -9,6 +10,8 @@ import { signupRouter } from "./routes/signup";
 
 import { errorHandler } from "./middlewares/error-handler";
 import { NotFoundError } from "./lib/utils/errors/not-found-error";
+
+import { keys } from "./lib/utils/keys";
 
 const app = express();
 app.use(json());
@@ -29,6 +32,18 @@ app.use(async () => {
 
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log("Listening on port 3000");
-});
+const start = async () => {
+  try {
+    const { mongoURI } = keys;
+    await mongoose.connect(mongoURI);
+    console.log("Connected to MongoDB...");
+  } catch (error) {
+    console.log("Error connecting to MongoDB: ", error);
+  }
+
+  app.listen(3000, () => {
+    console.log("Listening on port 3000");
+  });
+};
+
+start();
