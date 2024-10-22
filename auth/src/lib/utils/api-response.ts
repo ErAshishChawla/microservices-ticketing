@@ -1,23 +1,19 @@
 export class ApiResponse {
-  status: number;
+  statusCode: number;
   errors?: ApiResponseError[];
   data?: ApiResponseData;
   success: boolean;
 
-  constructor(
-    status: number,
-    errors?: ApiResponseError[],
-    data?: ApiResponseData
-  ) {
-    this.status = status;
+  constructor({ statusCode, errors, data }: ApiResponseAttrs) {
+    this.statusCode = statusCode;
     this.errors = errors;
     this.data = data;
-    this.success = status >= 200 && status < 300;
+    this.success = statusCode >= 200 && statusCode < 300;
   }
 
   get JSON() {
     return {
-      status: this.status,
+      statusCode: this.statusCode,
       errors: this.errors,
       data: this.data,
       success: this.success,

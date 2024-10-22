@@ -9,16 +9,22 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof CustomError) {
-    return res
-      .status(err.statusCode)
-      .send(new ApiResponse(err.statusCode, err.serializeError()).JSON);
+    return res.status(err.statusCode).send(
+      new ApiResponse({
+        statusCode: err.statusCode,
+        errors: err.serializeError(),
+      }).JSON
+    );
   }
 
   res.status(400).send(
-    new ApiResponse(400, [
-      {
-        message: "Something went wrong",
-      },
-    ]).JSON
+    new ApiResponse({
+      statusCode: 400,
+      errors: [
+        {
+          message: "Something went wrong",
+        },
+      ],
+    }).JSON
   );
 };

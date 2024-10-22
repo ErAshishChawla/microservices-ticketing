@@ -33,12 +33,22 @@ app.use(async () => {
 app.use(errorHandler);
 
 const start = async () => {
-  try {
-    const { mongoURI } = keys;
-    await mongoose.connect(mongoURI);
-    console.log("Connected to MongoDB...");
-  } catch (error) {
-    console.log("Error connecting to MongoDB: ", error);
+  const MAX_RETRIES = 5;
+  const { mongoURI } = keys;
+
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      await mongoose.connect(mongoURI);
+      mongoose.connection.on("error", (error) => {
+        console.log("Connection to MongoDB failed: ", error);
+      });
+      console.log("Connected to MongoDB...");
+      break;
+    } catch (error) {
+      console.log("Error connecting to MongoDB: ", error);
+      console.log("Retrying in 5 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
   }
 
   app.listen(3000, () => {
