@@ -6,13 +6,21 @@ build:
   local:
     push: false
   artifacts:
-    - image: ticketing/auth
+    - image: erashishchawla/ticketing-auth
       context: auth
       docker:
         dockerfile: Dockerfile.dev
       sync:
         manual:
           - src: "src/**/*.ts"
+            dest: .
+    - image: erashishchawla/ticketing-client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "./**/*.ts"
             dest: .
 manifests:
   rawYaml:
