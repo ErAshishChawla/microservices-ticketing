@@ -1,7 +1,3 @@
-declare interface ApiResponseData {
-  [key: string]: any;
-}
-
 declare interface ApiResponseError {
   message: string;
   field?: string;
@@ -9,6 +5,6 @@ declare interface ApiResponseError {
 
 declare interface ApiResponseAttrs {
   statusCode: number;
-  data?: ApiResponseData;
+  data?: any;
   errors?: ApiResponseError[];
 }

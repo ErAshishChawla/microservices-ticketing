@@ -1,7 +1,7 @@
 export class ApiResponse {
   statusCode: number;
   errors?: ApiResponseError[];
-  data?: ApiResponseData;
+  data?: any;
   success: boolean;
 
   constructor({ statusCode, errors, data }: ApiResponseAttrs) {

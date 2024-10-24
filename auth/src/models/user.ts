@@ -52,6 +52,14 @@ const userSchema = new Schema(
     },
   },
   {
+    versionKey: false,
+    toJSON: {
+      transform(doc: UserDoc, ret) {
+        ret.id = ret._id;
+        delete ret.password;
+        delete ret._id;
+      },
+    },
     timestamps: true,
   }
 );

@@ -17,12 +17,14 @@ Flow:
 */
 
 import { Router } from "express";
+import jwt from "jsonwebtoken";
 
 import { User } from "../models/user";
 
 import { BadRequestError, RequestValidationError } from "../lib/utils/errors";
 import { signUpSchema } from "../lib/zod/utlis.zod";
 import ApiResponse from "../lib/utils/api-response";
+import { keys } from "../lib/utils/keys";
 
 const router = Router();
 
@@ -48,11 +50,27 @@ router.post("/api/users/signup", async (req, res) => {
 
   // 8. Create a new user. User model hashes the password before storing it.
   const user = User.build({ email, password });
+  // 9. Save the user to the database.
   user.save();
+
+  // 10. Generate a JWT.
+  const userJwt = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    keys.jwtKey!
+  );
+
+  // Store it on session object
+  req.session = {
+    jwt: userJwt,
+  };
 
   return res.status(201).send(
     new ApiResponse({
       statusCode: 201,
+      data: user,
     })
   );
 });

@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { json } from "body-parser";
 import "express-async-errors";
 import mongoose from "mongoose";
+import cookieSession from "cookie-session";
 
 import { currentUserRouter } from "./routes/current-user";
 import { signinRouter } from "./routes/signin";
@@ -14,7 +15,15 @@ import { NotFoundError } from "./lib/utils/errors/not-found-error";
 import { keys } from "./lib/utils/keys";
 
 const app = express();
+// Traffic is being proxied to our app through ingress-nginx. By default express does not trust the proxy and will not accept https requests. We need to tell express to trust the proxy.
+app.set("trust proxy", true);
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false,
+    secure: true,
+  })
+);
 
 app.use((req: Request, res: Response, next) => {
   console.log("Request details: ", req.method, req.path);
@@ -35,6 +44,13 @@ app.use(errorHandler);
 const start = async () => {
   const MAX_RETRIES = 5;
   const { mongoURI } = keys;
+
+  // Check if all the required environment variables are set.
+  Object.values(keys).forEach((value) => {
+    if (!value) {
+      throw new Error("Missing environment variable");
+    }
+  });
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
