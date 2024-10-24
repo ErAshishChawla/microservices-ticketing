@@ -56,6 +56,8 @@ const userSchema = new Schema(
     toJSON: {
       transform(doc: UserDoc, ret) {
         ret.id = ret._id;
+        ret.createdAt = doc.createdAt;
+        ret.updatedAt = doc.updatedAt;
         delete ret.password;
         delete ret._id;
       },

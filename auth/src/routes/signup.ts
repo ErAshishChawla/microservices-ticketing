@@ -25,10 +25,11 @@ import { BadRequestError, RequestValidationError } from "../lib/utils/errors";
 import { signUpSchema } from "../lib/zod/utlis.zod";
 import ApiResponse from "../lib/utils/api-response";
 import { keys } from "../lib/utils/keys";
+import { routeMap } from "./route-map";
 
 const router = Router();
 
-router.post("/api/users/signup", async (req, res) => {
+router.post(routeMap.signup(), async (req, res) => {
   // 1. Extract the email and password from the request body.
   const { email, password } = req?.body;
 
@@ -49,9 +50,7 @@ router.post("/api/users/signup", async (req, res) => {
   }
 
   // 8. Create a new user. User model hashes the password before storing it.
-  const user = User.build({ email, password });
-  // 9. Save the user to the database.
-  user.save();
+  const user = await User.build({ email, password }).save();
 
   // 10. Generate a JWT.
   const userJwt = jwt.sign(
