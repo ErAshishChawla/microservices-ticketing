@@ -1,7 +1,8 @@
+# 1. Deployment for auth service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-deployment
+  name: auth-depl
 spec:
   replicas: 1
   selector:
@@ -19,7 +20,7 @@ spec:
             - containerPort: 3000
           env:
             - name: MONGO_HOST
-              value: auth-mongo-cluster-ip-service
+              value: auth-mongo-srv
             - name: MONGO_PORT
               value: "27017"
             - name: MONGO_DB
@@ -29,3 +30,55 @@ spec:
                 secretKeyRef:
                   name: ticketing-jwt-secret
                   key: JWT_KEY
+
+---
+# 2. Cluster IP for auth service for auth service
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  selector:
+    component: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+# 3. Mongo Deployment for auth service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: auth-mongo
+  template:
+    metadata:
+      labels:
+        component: auth-mongo
+    spec:
+      containers:
+        - name: auth-mongo
+          image: mongo
+          ports:
+            - containerPort: 27017
+
+---
+# 4. Cluster IP for auth mongo service
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-mongo-srv
+spec:
+  selector:
+    component: auth-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
