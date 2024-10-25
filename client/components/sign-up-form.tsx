@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { signupSchema, SignupValues } from "@/lib/zod.schemas";
+import { signup } from "@/lib/auth.utils";
+import { useToast } from "@/hooks/use-toast";
+import { clientRoutes } from "@/lib/routes";
 
 function SignUpForm() {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [showPassword, setShowPassword] = React.useState(false);
   const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
@@ -32,8 +38,30 @@ function SignUpForm() {
   });
   const isSubmitting = form.formState.isSubmitting;
 
-  const onSubmit = (values: SignupValues) => {
-    console.log(values);
+  const onSubmit = async (values: SignupValues) => {
+    const signupRes = await signup(values);
+
+    if (!signupRes?.success) {
+      signupRes?.errors?.forEach((error) => {
+        const field = error?.field?.split(".").pop();
+        toast({
+          title: field ? `Error in ${field}` : "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+
+      return;
+    }
+
+    toast({
+      title: "Sign up successful",
+      description: "You have successfully signed up",
+      variant: "default",
+    });
+
+    form.reset();
+    router.push(clientRoutes.landing());
   };
 
   return (
@@ -69,7 +97,12 @@ function SignUpForm() {
                       {...field}
                       type={showPassword ? "text" : "password"}
                     />
-                    <Button size="icon" variant="ghost" type="button">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      type="button"
+                      onClick={toggleShowPassword}
+                    >
                       {showPassword ? (
                         <Eye className="w-8 h-8" />
                       ) : (
@@ -86,7 +119,7 @@ function SignUpForm() {
             type="submit"
             variant={"secondary"}
             disabled={isSubmitting}
-            className="gap-3"
+            className="gap-3 w-full sm:w-fit"
           >
             {isSubmitting && <Loader2 className="w-6 h-6 animate-spin" />}
             Sign up
