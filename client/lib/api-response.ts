@@ -11,7 +11,7 @@ export class ApiResponse {
     this.success = statusCode >= 200 && statusCode < 300;
   }
 
-  get JSON() {
+  get JSON(): ApiResponseJson {
     return {
       statusCode: this.statusCode,
       errors: this.errors,

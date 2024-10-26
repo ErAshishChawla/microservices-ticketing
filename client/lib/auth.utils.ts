@@ -8,10 +8,14 @@
  */
 
 import { SignupValues } from "./zod.schemas";
-import { apiRoutes } from "./routes";
-import { sendApiRequest } from "./axios.utils";
+import { externalApiRoutes } from "./routes";
+import { sendExternalApiRequest } from "./axios.utils";
 import { HttpMethods } from "./types.utils";
 
 export const signup = async (values: SignupValues) => {
-  return sendApiRequest(HttpMethods.POST, apiRoutes.signup(), values);
+  return sendExternalApiRequest(
+    HttpMethods.POST,
+    externalApiRoutes.signup(),
+    values
+  );
 };

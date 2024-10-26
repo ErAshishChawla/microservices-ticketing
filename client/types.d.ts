@@ -13,7 +13,25 @@ declare interface ApiResponseAttrs {
   errors?: ApiResponseError[];
 }
 
+declare interface ApiResponseJson {
+  statusCode: number;
+  errors?: ApiResponseError[];
+  data?: any;
+  success: boolean;
+}
+
 declare interface UserPayload {
   id: string;
   email: string;
+}
+
+declare interface ErrorPageProps {
+  searchParams: {
+    statusCode?: string;
+    message?: string;
+  };
+}
+
+declare interface KeyValueObject {
+  [key: string]: any;
 }
