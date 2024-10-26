@@ -1,38 +1,26 @@
 import React from "react";
 import axios from "axios";
 
-import { clientRoutes, internalApiRoutes } from "@/lib/routes";
-import { sendInternalApiRequest } from "@/lib/fetch.utils";
 import { HttpMethods } from "@/lib/types.utils";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { buildClientServer } from "@/lib/axios.utils";
 
 async function Page() {
-  const headersList = headers();
-  const newHeaders: KeyValueObject = {};
-  headersList.forEach((value, key) => {
-    newHeaders[key] = value;
-  });
+  const handler = buildClientServer(headers);
+
   const config = {
     method: HttpMethods.GET,
-    url: "http://auth-srv:3000/api/users/currentuser",
-    headers: {
-      ...newHeaders,
-      "Content-Type": "application/json",
-      Host: "ticketing.dev",
-      "Custom-Header": "custom",
-    },
+    url: "/api/users/currentuser",
   };
-  try {
-    const res = await axios(config);
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  }
+
+  const getCurrentUserRes = await handler(config);
+
+  const currentUser = getCurrentUserRes?.data;
+
   return (
     <div className="w-full h-full">
-      {/* {currentUser ? "You are logged in" : "You are not logged in"} */}
-      Hi
+      {currentUser ? "You are logged in" : "You are not logged in"}
     </div>
   );
 }

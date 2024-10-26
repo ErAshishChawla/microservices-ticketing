@@ -3,42 +3,62 @@
  * @description This file contains utility functions for making API requests using Axios.
  * It includes a function `sendApiRequest` that handles HTTP requests with error handling.
  */
-import axios, { AxiosError } from "axios";
+import { type headers } from "next/headers";
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  AxiosInstance,
+  AxiosRequestConfig,
+} from "axios";
 
 import ApiResponse from "./api-response";
 import { InternalServerError } from "./errors.utils";
-import { HttpMethods } from "./types.utils";
 
-export const sendExternalApiRequest = async (
-  method: HttpMethods,
-  route: string,
-  data?: any
-) => {
+export const handleRequest = async <D>(
+  client: AxiosInstance,
+  config: AxiosRequestConfig<D>
+): Promise<ApiResponseJson> => {
   try {
-    const config = {
-      method: method,
-      url: route,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      timeout: 10000,
-    };
-    const res = (await axios(config))?.data as ApiResponseJson;
+    const response = (await client(config)).data as ApiResponseJson;
 
-    return res;
-  } catch (error) {
-    console.log("Error: ", error);
-    if (error instanceof AxiosError) {
-      const res = error.response?.data as ApiResponseJson | undefined;
+    return response;
+  } catch (err) {
+    console.log("Error: ", err);
+    if (err instanceof AxiosError) {
+      const res = err?.response?.data as ApiResponseJson;
       if (res) {
         return res;
       }
     }
-
-    const err = new InternalServerError();
+    const error = new InternalServerError();
     return new ApiResponse({
-      statusCode: err.statusCode,
-      errors: err.serializeError(),
+      statusCode: error.statusCode,
+      errors: error.serializeError(),
     }).JSON;
   }
+};
+
+export const buildClient = () => {
+  const client = axios.create({
+    baseURL: "/",
+  });
+
+  return <D>(config: AxiosRequestConfig<D>) => handleRequest(client, config);
+};
+
+export const buildClientServer = (headersFn: typeof headers) => {
+  const requestHeaders = new AxiosHeaders();
+  const headersList = headersFn();
+  headersList.forEach((value, key) => {
+    requestHeaders.set(key, value);
+  });
+
+  requestHeaders.set("host", "ticketing.dev");
+
+  const client = axios.create({
+    baseURL: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local",
+    headers: requestHeaders,
+  });
+
+  return <D>(config: AxiosRequestConfig<D>) => handleRequest(client, config);
 };
