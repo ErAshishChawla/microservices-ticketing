@@ -4,7 +4,6 @@ import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,20 +17,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
-import { signupSchema, SignupValues } from "@/lib/zod.schemas";
-import { signup } from "@/lib/auth.utils";
+import { signinSchema, SigninValues } from "@/lib/zod.schemas";
+import { signin } from "@/lib/auth.utils";
 import { useToast } from "@/hooks/use-toast";
 import { clientRoutes } from "@/lib/routes";
+import Link from "next/link";
 
-function SignUpForm() {
+function SignInForm() {
   const router = useRouter();
   const { toast } = useToast();
 
   const [showPassword, setShowPassword] = React.useState(false);
   const toggleShowPassword = () => setShowPassword((prev) => !prev);
 
-  const form = useForm<SignupValues>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<SigninValues>({
+    resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -39,11 +39,11 @@ function SignUpForm() {
   });
   const isSubmitting = form.formState.isSubmitting;
 
-  const onSubmit = async (values: SignupValues) => {
-    const signupRes = await signup(values);
+  const onSubmit = async (values: SigninValues) => {
+    const signinRes = await signin(values);
 
-    if (!signupRes?.success) {
-      signupRes?.errors?.forEach((error) => {
+    if (!signinRes?.success) {
+      signinRes?.errors?.forEach((error) => {
         const field = error?.field?.split(".").pop();
         toast({
           title: field ? `Error in ${field}` : "Error",
@@ -56,8 +56,8 @@ function SignUpForm() {
     }
 
     toast({
-      title: "Sign up successful",
-      description: "You have successfully signed up",
+      title: "Sign in successful",
+      description: "You have successfully signed in",
       variant: "default",
     });
 
@@ -68,8 +68,7 @@ function SignUpForm() {
 
   return (
     <div className="w-full max-w-sm flex flex-col gap-8">
-      <h2 className="text-4xl font-semibold">Sign up</h2>
-
+      <h2 className="text-4xl font-semibold">Sign in</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -118,11 +117,10 @@ function SignUpForm() {
             )}
           />
           <div className="w-full flex items-center">
-            <Link href={clientRoutes.signin()} className="text-sm underline">
-              Already a user?
+            <Link href={clientRoutes.signup()} className="text-sm underline">
+              New to the platform?
             </Link>
           </div>
-
           <Button
             type="submit"
             variant={"secondary"}
@@ -130,7 +128,7 @@ function SignUpForm() {
             className="gap-3 w-full sm:w-fit"
           >
             {isSubmitting && <Loader2 className="w-6 h-6 animate-spin" />}
-            Sign up
+            Sign in
           </Button>
         </form>
       </Form>
@@ -138,4 +136,4 @@ function SignUpForm() {
   );
 }
 
-export default SignUpForm;
+export default SignInForm;

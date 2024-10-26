@@ -7,15 +7,59 @@
  * If the server is down or route is not found, we dont want to tell the user that the server is down or the route is not found. We just show a generic error message.
  */
 
-import { SignupValues } from "./zod.schemas";
-import { externalApiRoutes } from "./routes";
-import { sendExternalApiRequest } from "./axios.utils";
+import { type headers } from "next/headers";
+
+import { SigninValues, SignupValues } from "./zod.schemas";
+import { externalApiRoutes, internalApiRoutes } from "./routes";
+import { buildClient, buildClientServer } from "./axios.utils";
 import { HttpMethods } from "./types.utils";
 
 export const signup = async (values: SignupValues) => {
-  return sendExternalApiRequest(
-    HttpMethods.POST,
-    externalApiRoutes.signup(),
-    values
-  );
+  const handler = buildClient();
+  const config = {
+    method: HttpMethods.POST,
+    url: externalApiRoutes.signup(),
+    data: values,
+  };
+
+  return await handler(config);
+};
+
+export const signin = async (values: SigninValues) => {
+  const handler = buildClient();
+  const config = {
+    method: HttpMethods.POST,
+    url: externalApiRoutes.signin(),
+    data: values,
+  };
+
+  return await handler(config);
+};
+
+export const signout = async () => {
+  const handler = buildClient();
+  const config = {
+    method: HttpMethods.POST,
+    url: externalApiRoutes.signout(),
+  };
+
+  return await handler(config);
+};
+
+export const getCurrentUser = async (headerFn: typeof headers) => {
+  const handler = buildClientServer(headerFn);
+  const config = {
+    method: HttpMethods.GET,
+    url: internalApiRoutes.currentUser(),
+  };
+
+  const getCurrentUserRes = await handler(config);
+
+  if (!getCurrentUserRes.success || !getCurrentUserRes?.data) {
+    return null;
+  }
+
+  const currentUser = getCurrentUserRes.data;
+
+  return currentUser as UserPayload;
 };

@@ -3,7 +3,6 @@
  * @description This file contains utility functions for making API requests using Axios.
  * It includes a function `sendApiRequest` that handles HTTP requests with error handling.
  */
-import { type headers } from "next/headers";
 import axios, {
   AxiosError,
   AxiosHeaders,
@@ -14,9 +13,11 @@ import axios, {
 import ApiResponse from "./api-response";
 import { InternalServerError } from "./errors.utils";
 
-export const handleRequest = async <D>(
+import { type headers } from "next/headers";
+
+export const handleRequest = async (
   client: AxiosInstance,
-  config: AxiosRequestConfig<D>
+  config: AxiosRequestConfig
 ): Promise<ApiResponseJson> => {
   try {
     const response = (await client(config)).data as ApiResponseJson;
@@ -60,5 +61,5 @@ export const buildClientServer = (headersFn: typeof headers) => {
     headers: requestHeaders,
   });
 
-  return <D>(config: AxiosRequestConfig<D>) => handleRequest(client, config);
+  return (config: AxiosRequestConfig) => handleRequest(client, config);
 };

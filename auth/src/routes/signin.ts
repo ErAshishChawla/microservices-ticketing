@@ -49,7 +49,10 @@ router.post(routeMap.signin(), async (req: Request, res: Response) => {
   }
 
   // 4. compare the password
-  const passwordsMatch = User.comparePassword(password, existingUser.password);
+  const passwordsMatch = await User.comparePassword(
+    password,
+    existingUser.password
+  );
 
   if (!passwordsMatch) {
     throw new BadRequestError("Invalid credentials");

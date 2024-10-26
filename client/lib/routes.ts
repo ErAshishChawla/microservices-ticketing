@@ -2,6 +2,8 @@ import qs from "query-string";
 
 export const externalApiRoutes = {
   signup: () => "/api/users/signup",
+  signin: () => "/api/users/signin",
+  signout: () => "/api/users/signout",
 };
 
 export const internalApiRoutes = {
