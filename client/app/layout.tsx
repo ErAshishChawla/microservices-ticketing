@@ -5,7 +5,6 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/navbar";
-import { getCurrentUser } from "@/lib/auth.utils";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,21 +24,20 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await getCurrentUser(headers);
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw h-dvh bg-black/90 text-white/90`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw h-dvh bg-stone-800 text-white/90`}
       >
         <main className="w-full h-full">
-          <Navbar currentUser={currentUser} />
+          <Navbar />
           <section className="w-full h-[calc(100%_-_5rem)] flex flex-col items-center">
-            <section className="w-full max-w-2xl h-full">{children}</section>
+            <section className="w-full max-w-7xl h-full">{children}</section>
           </section>
         </main>
         <Toaster />

@@ -45,6 +45,7 @@ router.post(routeMap.signin(), async (req: Request, res: Response) => {
   const existingUser = await User.findOne({ email });
 
   if (!existingUser) {
+    console.log("User not found");
     throw new BadRequestError("Invalid credentials");
   }
 
@@ -55,6 +56,7 @@ router.post(routeMap.signin(), async (req: Request, res: Response) => {
   );
 
   if (!passwordsMatch) {
+    console.log("Passwords do not match");
     throw new BadRequestError("Invalid credentials");
   }
 

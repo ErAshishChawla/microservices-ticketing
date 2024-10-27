@@ -35,7 +35,3 @@ declare interface ErrorPageProps {
 declare interface KeyValueObject {
   [key: string]: any;
 }
-
-declare interface NavbarProps {
-  currentUser: UserPayload | null;
-}
