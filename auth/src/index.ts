@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import { app } from "./app";
-import { keys } from "./lib/utils/keys";
+import { keys } from "./lib/keys";
 
 const start = async () => {
   const MAX_RETRIES = 5;

@@ -1,7 +1,7 @@
-import express, { Router } from "express";
+import { Router } from "express";
 
 import { routeMap } from "./route-map";
-import ApiResponse from "../lib/utils/api-response";
+import { ApiResponse } from "@eractickets/ticketing-common";
 
 const router = Router();
 

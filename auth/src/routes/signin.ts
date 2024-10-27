@@ -13,14 +13,17 @@ Flow:
 
 import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
+import {
+  ApiResponse,
+  BadRequestError,
+  RequestValidationError,
+} from "@eractickets/ticketing-common";
 
 import { User } from "../models/user";
 
 import { signInSchema } from "../lib/zod/utlis.zod";
-import { BadRequestError, RequestValidationError } from "../lib/utils/errors";
 import { routeMap } from "./route-map";
-import { keys } from "../lib/utils/keys";
-import ApiResponse from "../lib/utils/api-response";
+import { keys } from "../lib/keys";
 
 const router = Router();
 

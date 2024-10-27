@@ -7,10 +7,9 @@ Flow:
 */
 
 import { Router } from "express";
+import { ApiResponse, currentUser } from "@eractickets/ticketing-common";
 
 import { routeMap } from "./route-map";
-import ApiResponse from "../lib/utils/api-response";
-import { currentUser } from "../middlewares/current-user";
 
 const router = Router();
 
