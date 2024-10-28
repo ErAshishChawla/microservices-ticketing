@@ -24,6 +24,14 @@ build:
             dest: .
           - src: "**/*.tsx"
             dest: .
+    - image: erashishchawla/ticketing-tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
 manifests:
   rawYaml:
     - k8s/*

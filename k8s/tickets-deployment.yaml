@@ -1,0 +1,86 @@
+# This file is used to create a deployment for the tickets service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: tickets
+  template:
+    metadata:
+      labels:
+        component: tickets
+    spec:
+      containers:
+        - name: tickets
+          image: erashishchawla/ticketing-tickets:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_HOST
+              value: tickets-mongo-srv
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_DB
+              value: tickets
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-jwt-secret
+                  key: JWT_KEY
+---
+# This file is used to create a Cluster IP service for the tickets service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-srv
+spec:
+  selector:
+    component: tickets
+  ports:
+    - name: tickets
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+# This file is used to create a deployment for the tickets mongo service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: tickets-mongo
+  template:
+    metadata:
+      labels:
+        component: tickets-mongo
+    spec:
+      containers:
+        - name: tickets-mongo
+          image: mongo
+          ports:
+            - containerPort: 27017
+
+---
+# This file is used to create a Cluster IP service for the tickets mongo service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-mongo-srv
+spec:
+  selector:
+    component: tickets-mongo
+  ports:
+    - name: tickets-mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
