@@ -52,7 +52,6 @@ const userSchema = new Schema(
     },
   },
   {
-    versionKey: false,
     toJSON: {
       transform(doc: UserDoc, ret) {
         ret.id = ret._id;
