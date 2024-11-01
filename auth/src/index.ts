@@ -4,19 +4,18 @@ import { app } from "./app";
 import { keys } from "./lib/keys";
 
 const start = async () => {
-  const MAX_RETRIES = 5;
-  const { mongoURI } = keys;
+  const { mongoHost, mongoDb, mongoPort } = keys;
 
   // Check if all the required environment variables are set.
-  Object.values(keys).forEach((value) => {
+  Object.entries(keys).forEach(([key, value]) => {
     if (!value) {
-      throw new Error("Missing environment variable");
+      throw new Error(`Environment variable ${key} is not set`);
     }
   });
 
-  for (let i = 0; i < MAX_RETRIES; i++) {
+  while (true) {
     try {
-      await mongoose.connect(mongoURI);
+      await mongoose.connect(`mongodb://${mongoHost}:${mongoPort}/${mongoDb}`);
       mongoose.connection.on("error", (error) => {
         console.log("Connection to MongoDB failed: ", error);
       });

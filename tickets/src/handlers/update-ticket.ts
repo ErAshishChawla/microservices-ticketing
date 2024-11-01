@@ -8,7 +8,8 @@
 // 6. CHeck if ticket belongs to the user
 // 7. Update the ticket with the new title and price.
 // 8. Save the updated ticket to the database.
-// 9. Return the updated ticket as a response to the user.
+// 9. Emit a TicketUpdated event.
+// 10. Return the updated ticket as a response to the user.
 
 import { Request, Response } from "express";
 import mongoose from "mongoose";
@@ -20,8 +21,11 @@ import {
   UnauthorizedError,
 } from "@eractickets/ticketing-common";
 
-import { createTicketSchema } from "../lib/zod.utils";
 import { Ticket } from "../models/ticket";
+
+import { createTicketSchema } from "../lib/zod.utils";
+import { NatsWrapper } from "../lib/nats-wrapper.utils";
+import { TicketUpdatedPublisher } from "../lib/events/publisher/ticket-updated-publisher";
 
 export async function updateTicket(req: Request, res: Response) {
   const currentUser = req.currentUser!;
@@ -66,12 +70,19 @@ export async function updateTicket(req: Request, res: Response) {
     price: incomingPrice,
   });
 
-  const updatedTicket = (await existingTicket.save()).toJSON();
+  const updatedTicket = await existingTicket.save();
+
+  await new TicketUpdatedPublisher(NatsWrapper.stan).publish({
+    id: updatedTicket.id,
+    title: updatedTicket.title,
+    price: updatedTicket.price,
+    userId: updatedTicket.userId,
+  });
 
   return res.status(200).send(
     new ApiResponse({
       statusCode: 200,
-      data: updatedTicket,
+      data: updatedTicket.toJSON(),
     })
   );
 }

@@ -26,6 +26,16 @@ spec:
               value: "27017"
             - name: MONGO_DB
               value: tickets
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_HOST
+              value: nats-srv
+            - name: NATS_PORT
+              value: "4222"
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:

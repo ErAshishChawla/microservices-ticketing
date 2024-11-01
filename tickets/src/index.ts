@@ -1,22 +1,23 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 import { app } from "./app";
 import { keys } from "./lib/keys";
+import { NatsWrapper } from "./lib/nats-wrapper.utils";
 
 const start = async () => {
-  const MAX_RETRIES = 5;
-  const { mongoURI } = keys;
+  const { mongoHost, mongoDb, mongoPort, natsHost, natsPort } = keys;
 
   // Check if all the required environment variables are set.
-  Object.values(keys).forEach((value) => {
+  Object.entries(keys).forEach(([key, value]) => {
     if (!value) {
-      throw new Error("Missing environment variable");
+      throw new Error(`Environment variable ${key} is not set`);
     }
   });
 
-  for (let i = 0; i < MAX_RETRIES; i++) {
+  while (true) {
     try {
-      await mongoose.connect(mongoURI);
+      await mongoose.connect(`mongodb://${mongoHost}:${mongoPort}/${mongoDb}`);
       mongoose.connection.on("error", (error) => {
         console.log("Connection to MongoDB failed: ", error);
       });
@@ -24,6 +25,31 @@ const start = async () => {
       break;
     } catch (error) {
       console.log("Error connecting to MongoDB: ", error);
+      console.log("Retrying in 5 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  }
+
+  while (true) {
+    try {
+      await NatsWrapper.connect(
+        "ticketing",
+        crypto.randomBytes(4).toString("hex"),
+        {
+          url: `http://${natsHost}:${natsPort}`,
+        }
+      );
+
+      const stan = NatsWrapper.stan;
+      stan.on("close", () => {
+        console.log("NATS connection closed");
+        process.exit();
+      });
+      process.on("SIGINT", () => stan.close());
+      process.on("SIGTERM", () => stan.close());
+      break;
+    } catch (error) {
+      console.log("Error connecting to NATS: ", error);
       console.log("Retrying in 5 seconds...");
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }

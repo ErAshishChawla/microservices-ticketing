@@ -53,7 +53,7 @@ const ticketSchema = new Schema(
     versionKey: false,
     toJSON: {
       transform(doc, ret) {
-        ret.id = ret._id;
+        ret.id = ret._id as string;
         delete ret._id;
       },
     },

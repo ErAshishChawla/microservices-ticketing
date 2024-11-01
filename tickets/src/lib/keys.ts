@@ -1,3 +1,7 @@
 export const keys = {
-  mongoURI: `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`,
+  mongoHost: process.env.MONGO_HOST,
+  mongoPort: process.env.MONGO_PORT,
+  mongoDb: process.env.MONGO_DB,
+  natsHost: process.env.NATS_HOST,
+  natsPort: process.env.NATS_PORT,
 };

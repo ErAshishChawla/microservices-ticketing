@@ -5,6 +5,7 @@ This file will be responsible for creating a new ticket. It will validate the in
 2. Validate the incoming request body using the createTicketSchema.
 3. If the validation fails, throw a RequestValidationError with the errors.
 4. If the validation passes, create a new ticket
+5. Publish a TicketCreated event
 */
 
 import { Request, Response } from "express";
@@ -16,6 +17,8 @@ import {
 import { Ticket } from "../models/ticket";
 
 import { createTicketSchema } from "../lib/zod.utils";
+import { TicketCreatedPublisher } from "../lib/events/publisher/ticket-created-publisher";
+import { NatsWrapper } from "../lib/nats-wrapper.utils";
 
 export const createTicket = async (req: Request, res: Response) => {
   const currentUser = req.currentUser!;
@@ -38,12 +41,20 @@ export const createTicket = async (req: Request, res: Response) => {
   const { title, price } = validationResults.data;
 
   // Create a new ticket
-  const newTicket = await Ticket.build({
+  const newTicket = Ticket.build({
     title,
     price,
     userId: currentUser.id,
-  }).save();
+  });
+  await newTicket.save();
 
+  const stan = NatsWrapper.stan;
+  await new TicketCreatedPublisher(stan).publish({
+    id: newTicket.id,
+    title: newTicket.title,
+    price: newTicket.price,
+    userId: newTicket.userId,
+  });
   const ticket = newTicket.toJSON();
 
   return res.status(201).send(
