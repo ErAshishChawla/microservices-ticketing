@@ -7,9 +7,9 @@ const { Types } = Schema;
 // 1. Define interface required to build a new order
 interface OrderAttrs {
   userId: string;
-  status: string;
+  status: OrderStatus;
   expiresAt: Date;
-  ticket: OrderStatus;
+  ticket: TicketDoc;
 }
 
 // 2. Define interface for properties an Order documennt has
@@ -62,4 +62,5 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs);
 };
 
-const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
+export const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
+export { OrderStatus };
