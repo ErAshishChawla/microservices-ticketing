@@ -20,7 +20,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@eractickets/ticketing-common": "^1.0.8",
+    "@eractickets/ticketing-common": "^1.0.9",
     "@types/luxon": "^3.4.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",

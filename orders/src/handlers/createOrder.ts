@@ -13,6 +13,8 @@ import { Order } from "../models/order";
 
 import { createOrderSchema } from "../lib/utils/zod.utils";
 import { keys } from "../lib/keys";
+import { NatsWrapper } from "../lib/utils/nats-wrapper.utils";
+import { OrderCreatedPublisher } from "../lib/utils/events/publishers/order-created-publisher";
 
 export async function createOrder(req: Request, res: Response) {
   const { incomingTicketId } = req?.body;
@@ -60,6 +62,17 @@ export async function createOrder(req: Request, res: Response) {
   await order.save();
 
   // Publish an event saying that an order was created
+  const nats = NatsWrapper.stan;
+  new OrderCreatedPublisher(nats).publish({
+    id: order.id,
+    status: order.status,
+    userId: order.userId,
+    expiresAt: order.expiresAt.toISOString(),
+    ticket: {
+      id: existingTicket.id,
+      price: existingTicket.price,
+    },
+  });
 
   // Respond to the request indicating that the order was created
   return res
