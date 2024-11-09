@@ -20,7 +20,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@eractickets/ticketing-common": "^1.0.9",
+    "@eractickets/ticketing-common": "^1.0.10",
     "@types/luxon": "^3.4.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.5.0",
     "mongoose": "^8.7.2",
+    "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
     "zod": "^3.23.8"
   }

@@ -54,6 +54,7 @@ export const createTicket = async (req: Request, res: Response) => {
     title: newTicket.title,
     price: newTicket.price,
     userId: newTicket.userId,
+    version: newTicket.version,
   });
   const ticket = newTicket.toJSON();
 

@@ -44,6 +44,8 @@ export async function deleteOrder(req: Request, res: Response) {
   new OrderCancelledPublisher(NatsWrapper.stan).publish({
     id: order.id,
     status: order.status,
+    userId: order.userId,
+    version: order.version,
     ticket: {
       id: order.ticket.id,
     },

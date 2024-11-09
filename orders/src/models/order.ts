@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { OrderStatus } from "@eractickets/ticketing-common";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
 import { TicketDoc } from "./ticket";
 
 const { Types } = Schema;
@@ -20,6 +22,7 @@ interface OrderDoc extends mongoose.Document {
   ticket: TicketDoc;
   createdAt: string;
   updatedAt: string;
+  version: number;
 }
 
 // 3. Define interface for Order Model
@@ -57,6 +60,8 @@ const orderSchema = new Schema(
     timestamps: true,
   }
 );
+orderSchema.set("versionKey", "version");
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs);

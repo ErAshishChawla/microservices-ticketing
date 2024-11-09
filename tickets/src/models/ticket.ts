@@ -9,6 +9,8 @@ This file will be responsible for defining the Ticket model. It will define the 
 */
 
 import mongoose, { Schema } from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
 const { Types } = Schema;
 
 // 1. Define an interface for ticket model attributes
@@ -25,6 +27,7 @@ interface TicketDoc extends mongoose.Document {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  version: number;
 }
 
 // 3. Define an interface for the ticket model
@@ -58,6 +61,9 @@ const ticketSchema = new Schema(
     },
   }
 );
+
+ticketSchema.set("versionKey", "version");
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket(attrs);
