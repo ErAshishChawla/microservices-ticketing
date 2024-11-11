@@ -30,7 +30,7 @@ build:
         dockerfile: Dockerfile.dev
       sync:
         manual:
-          - src: "src/**/*.ts"
+          - src: "**/*.ts"
             dest: .
     - image: erashishchawla/ticketing-orders
       context: orders
@@ -38,7 +38,15 @@ build:
         dockerfile: Dockerfile.dev
       sync:
         manual:
-          - src: "src/**/*.ts"
+          - src: "**/*.ts"
+            dest: .
+    - image: erashishchawla/ticketing-expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "**/*.ts"
             dest: .
 manifests:
   rawYaml:

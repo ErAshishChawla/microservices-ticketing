@@ -42,7 +42,7 @@ spec:
                   name: ticketing-jwt-secret
                   key: JWT_KEY
             - name: EXPIRATION_WINDOW_MINUTES
-              value: "15"
+              value: "1"
 ---
 # This file is used to create a Cluster IP service for the tickets service
 

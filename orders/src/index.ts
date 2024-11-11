@@ -6,6 +6,7 @@ import { keys } from "./lib/keys";
 import { NatsWrapper } from "./lib/utils/nats-wrapper.utils";
 import { TicketCreatedListener } from "./lib/utils/events/listeners/ticket-created-listener";
 import { TicketUpdatedListener } from "./lib/utils/events/listeners/ticket-updated-listener";
+import { ExpirationCompleteListener } from "./lib/utils/events/listeners/expiration-complete-listener";
 const start = async () => {
   try {
     const { mongoHost, mongoDb, mongoPort, natsHost, natsPort } = keys;
@@ -56,6 +57,7 @@ const start = async () => {
         // Start listening for events
         new TicketCreatedListener(stan).listen();
         new TicketUpdatedListener(stan).listen();
+        new ExpirationCompleteListener(stan).listen();
 
         break;
       } catch (error) {

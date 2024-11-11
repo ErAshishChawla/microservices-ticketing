@@ -14,7 +14,7 @@ export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
 
   async onMessage(data: OrderCancelledEvent["data"], msg: Message) {
     // Extract the data from the event
-    const { id, ticket } = data;
+    const { ticket } = data;
 
     // Find the ticket that the order is reserving
     const existingTicket = await Ticket.findById(ticket.id);

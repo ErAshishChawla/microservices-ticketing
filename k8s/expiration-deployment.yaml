@@ -1,0 +1,64 @@
+# Deployment for the expiration service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: expiration
+  template:
+    metadata:
+      labels:
+        component: expiration
+    spec:
+      containers:
+        - name: expiration
+          image: erashishchawla/ticketing-expiration:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NATS_HOST
+              value: nats-srv
+            - name: NATS_PORT
+              value: "4222"
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+
+---
+# Redis Deployment for expiration service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-redis-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: expiration-redis
+  template:
+    metadata:
+      labels:
+        component: expiration-redis
+    spec:
+      containers:
+        - name: expiration-redis
+          image: redis
+          ports:
+            - containerPort: 6379
+
+---
+# Cluster IP for expiration redis
+apiVersion: v1
+kind: Service
+metadata:
+  name: expiration-redis-srv
+spec:
+  selector:
+    component: expiration-redis
+  ports:
+    - name: expiration-redis
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
