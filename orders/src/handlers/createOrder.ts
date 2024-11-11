@@ -17,7 +17,7 @@ import { NatsWrapper } from "../lib/utils/nats-wrapper.utils";
 import { OrderCreatedPublisher } from "../lib/utils/events/publishers/order-created-publisher";
 
 export async function createOrder(req: Request, res: Response) {
-  const { incomingTicketId } = req?.body;
+  const { ticketId: incomingTicketId } = req?.body;
 
   const validationResult = await createOrderSchema.safeParseAsync({
     ticketId: incomingTicketId,

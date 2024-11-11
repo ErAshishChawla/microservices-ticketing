@@ -4,6 +4,8 @@ import crypto from "crypto";
 import { app } from "./app";
 import { keys } from "./lib/keys";
 import { NatsWrapper } from "./lib/nats-wrapper.utils";
+import { OrderCreatedListener } from "./lib/events/listeners/order-created-listener";
+import { OrderCancelledListener } from "./lib/events/listeners/order-cancelled-listener";
 
 const start = async () => {
   const { mongoHost, mongoDb, mongoPort, natsHost, natsPort } = keys;
@@ -47,6 +49,9 @@ const start = async () => {
       });
       process.on("SIGINT", () => stan.close());
       process.on("SIGTERM", () => stan.close());
+
+      new OrderCreatedListener(stan).listen();
+      new OrderCancelledListener(stan).listen();
       break;
     } catch (error) {
       console.log("Error connecting to NATS: ", error);

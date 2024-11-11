@@ -65,6 +65,11 @@ export async function updateTicket(req: Request, res: Response) {
     throw new UnauthorizedError();
   }
 
+  // Check if the ticket is reserved
+  if (existingTicket.orderId) {
+    throw new BadRequestError("Cannot edit a reserved ticket");
+  }
+
   existingTicket.set({
     title: incomingTitle,
     price: incomingPrice,
