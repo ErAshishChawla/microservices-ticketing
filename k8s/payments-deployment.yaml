@@ -1,0 +1,101 @@
+# This is for payments deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: payments
+  template:
+    metadata:
+      labels:
+        component: payments
+    spec:
+      containers:
+        - name: payments
+          image: erashishchawla/ticketing-payments
+          ports:
+            - name: payments
+              containerPort: 3000
+          env:
+            - name: MONGO_HOST
+              value: payments-mongo-srv
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_DB
+              value: payments
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_HOST
+              value: nats-srv
+            - name: NATS_PORT
+              value: "4222"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-jwt-secret
+                  key: JWT_KEY
+            - name: STRIPE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-stripe-secret
+                  key: STRIPE_KEY
+
+---
+# This is for payments cluster IP service
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-srv
+spec:
+  selector:
+    component: payments
+  ports:
+    - name: payments
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+# This is for payments mongo deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: payments-mongo
+  template:
+    metadata:
+      labels:
+        component: payments-mongo
+    spec:
+      containers:
+        - name: payments-mongo
+          image: mongo
+          ports:
+            - name: payments-mongo
+              containerPort: 27017
+
+---
+# This is for payments mongo cluster IP service
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-mongo-srv
+spec:
+  selector:
+    component: payments-mongo
+  ports:
+    - name: payments-mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
