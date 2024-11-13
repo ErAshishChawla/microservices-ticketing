@@ -17,6 +17,10 @@ spec:
           image: erashishchawla/ticketing-client:latest
           ports:
             - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+              value: pk_test_51OnCQWDUjwEncn0SEdxfmQEZmKAduGIBA5l9vWgJzodh16FugXKp28Kx6eSJYGnnxxKDwVCydKGz7vlLiNCcEOlf00deJOVBll
+
 ---
 # 2. Cluster IP for client service for client service
 apiVersion: v1

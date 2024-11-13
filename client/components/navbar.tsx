@@ -18,6 +18,7 @@ async function Navbar() {
       <div className="flex items-center gap-3">
         {currentUser ? (
           <>
+            <Link href="/orders">Orders</Link>
             <SignOutForm />
           </>
         ) : (

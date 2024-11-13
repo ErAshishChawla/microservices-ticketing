@@ -24,7 +24,7 @@ export const handleRequest = async (
 
     return response;
   } catch (err) {
-    console.log("Error: ", err);
+    // console.log("Error: ", err);
     if (err instanceof AxiosError) {
       const res = err?.response?.data as ApiResponseJson;
       if (res) {
@@ -44,7 +44,7 @@ export const buildClient = () => {
     baseURL: "/",
   });
 
-  return <D>(config: AxiosRequestConfig<D>) => handleRequest(client, config);
+  return (config: AxiosRequestConfig) => handleRequest(client, config);
 };
 
 export const buildClientServer = (headersFn: typeof headers) => {

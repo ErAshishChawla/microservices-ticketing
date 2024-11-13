@@ -47,11 +47,15 @@ export async function allTickets(req: Request, res: Response) {
   const totalCount = await Ticket.countDocuments();
 
   // Fetch all tickets from the database
-  const tickets = (await Ticket.find().skip(skip).limit(parsedLimit)).map(
-    (ticket) => {
-      return ticket.toJSON();
-    }
-  );
+  const tickets = (
+    await Ticket.find({
+      orderId: undefined,
+    })
+      .skip(skip)
+      .limit(parsedLimit)
+  ).map((ticket) => {
+    return ticket.toJSON();
+  });
 
   // Calculate total pages
   const totalPages = Math.ceil(totalCount / parsedLimit);
